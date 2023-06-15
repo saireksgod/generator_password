@@ -26,12 +26,11 @@ class App(CTk.CTk):
 
         self.password_frame = CTk.CTkFrame(master=self, fg_color="transparent")
         self.password_frame.grid(row=1, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
-
+        
         self.entry_password = CTk.CTkEntry(master=self.password_frame, width=300)
         self.entry_password.grid(row=0, column=0, padx=(0, 20))
         self.entry_password.bind("<Button-1>", self.copy_to_clipboard)
         self.entry_password.configure(state="disabled")
-
         self.btn_generate = CTk.CTkButton(master=self.password_frame, text="Generate", width=100,
                                           command=self.set_password)
         self.btn_generate.grid(row=0, column=1)
@@ -45,7 +44,6 @@ class App(CTk.CTk):
 
         self.password_length_entry = CTk.CTkEntry(master=self.settings_frame, width=50)
         self.password_length_entry.grid(row=1, column=3, padx=(20, 10), sticky="we")
-        self.password_length_entry.configure(state="disabled")
 
         self.cb_digits_var = tk.StringVar()
 
@@ -76,13 +74,19 @@ class App(CTk.CTk):
         self.appearance_mode_option_menu.set("System")
         self.password_length_slider.set(12)
         self.password_length_entry.insert(0, "12")
+        self.password_length_entry.configure(state="disabled")
+        
 
     def slider_event(self, value):
         self.password_length_entry.configure(state="normal")
         self.password_length_entry.delete(0, 'end')
         self.password_length_entry.insert(0, int(value))
         self.password_length_entry.configure(state="disabled")
-
+    def start_error(self):
+        self.entry_password.configure(state="normal")
+        self.entry_password.delete(0, 'end')
+        self.entry_password.insert(0, "Ошибка")
+        self.entry_password.configure(state="disabled")
     def change_appearance_mode_event(self, new_appearance_mode):
         CTk.set_appearance_mode(new_appearance_mode)
 
@@ -92,13 +96,16 @@ class App(CTk.CTk):
         return chars
 
     def set_password(self):
+        select_mama = self.cb_digits_var.get() + self.cb_lower_var.get() + self.cb_upper_var.get() + self.cb_symbols_var.get()
+        if(len(select_mama) == 0): return self.start_error()
         self.entry_password.configure(state="normal")
         self.entry_password.delete(0, 'end')
         self.entry_password.insert(0, create_new(length=int(self.password_length_slider.get()),
                                                          characters=self.get_characters()))
         self.entry_password.configure(state="disabled")
-    def copy_to_clipboard(self):
-        pyperclip.copy(f"{self.entry_password.get()}")
+    def copy_to_clipboard(self, event):
+        pyperclip.copy(self.entry_password.get())
+        pyperclip.paste()
 
 def create_new(length, characters):
     return "".join(secrets.choice(characters) for _ in range(length))
