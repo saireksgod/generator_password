@@ -1,3 +1,4 @@
+# DEV MATVEY
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
 
 import tkinter as tk
